@@ -20,8 +20,11 @@ char *DEFAULT_FILE_NAME = "RandomNumbers.txt";
 int main()
 {
 	printf("Generating file of %d random numbers from [ %d, %d ]\n", NUMS_TO_GENERATE, MIN_RANDOM_NUM, MAX_RANDOM_NUM);
-	FILE *file = generateFileOfRandomNumbers(MIN_RANDOM_NUM, MAX_RANDOM_NUM, NUMS_TO_GENERATE, DEFAULT_FILE_NAME);
+	int openFileResult = generateFileOfRandomNumbers(MIN_RANDOM_NUM, MAX_RANDOM_NUM, NUMS_TO_GENERATE, DEFAULT_FILE_NAME);
 	
-	// Closing file.
-	fclose(file);
+	// Error opening file, log error and return.
+	if(openFileResult != 0) {
+		fprintf(stderr, "Error generating file.");
+		return 1;
+	}
 }

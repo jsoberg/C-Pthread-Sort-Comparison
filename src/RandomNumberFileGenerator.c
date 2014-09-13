@@ -11,12 +11,14 @@
  * @param maxNum - Maximum number to generate.
  * @param numtsoGenerate - Number of random numbers to generate in the file.
  * @param fileName - Name of file to be created.
- * @return - Returns the file pointer of the newly generated file. */	
-FILE* generateFileOfRandomNumbers(int minNum, int maxNum, int numsToGenerate, char* fileName) 
+ * @return - The result of the file being closed. */	
+int generateFileOfRandomNumbers(int minNum, int maxNum, int numsToGenerate, char* fileName) 
 {
 	// Opening file with write permissions.
-	FILE *file;
-	file = fopen(fileName, "w");
+	FILE *file = fopen(fileName, "w");
+	// If file is NULL, return 1.
+	if(file == NULL)
+		return 1;
 	
 	int randomNum = 0; 
 	// One randomely generated number per line for numsToGenerate iterations.
@@ -25,6 +27,6 @@ FILE* generateFileOfRandomNumbers(int minNum, int maxNum, int numsToGenerate, ch
 		randomNum = (rand() % maxNum) + minNum;
 		fprintf(file, "%d\n", randomNum);
 	}
-
-	return file;
+	int result = fclose(file);
+	return result;
 }

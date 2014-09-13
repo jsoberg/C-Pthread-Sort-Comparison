@@ -9,6 +9,6 @@
 
 // Function declaration.
 
-FILE* generateFileOfRandomNumbers(int minNum, int maxNum, int numsToGenerate, char* fileName);
+int generateFileOfRandomNumbers(int minNum, int maxNum, int numsToGenerate, char* fileName);
 
 #endif
