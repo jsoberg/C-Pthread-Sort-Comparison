@@ -9,6 +9,8 @@ SRCDIR = ./src
 BUILDDIR = ./build
 # Output directory.
 OUTDIR = ./output
+# Name of executable
+EXCNAME = a.out
 
 # Use gcc to build.
 CC=gcc
@@ -27,7 +29,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 # Creating executable.
-$(OUTDIR)/a.out: $(OBJ)
+$(OUTDIR)/$(EXCNAME): $(OBJ)
 	# Make sure output directory exists.
 	mkdir -p $(OUTDIR)
 	# Building output...
@@ -36,5 +38,5 @@ $(OUTDIR)/a.out: $(OBJ)
 .PHONY: clean
 
 clean:
-	# Cleaning up object files.
-	rm -f $(BUILDDIR)/*.o *~ core $(INCDIR)/*~ 
+	# Cleaning up object files and executable.
+	rm -f $(BUILDDIR)/*.o *~ core $(INCDIR)/*~ $(OUTDIR)/$(EXCNAME)
