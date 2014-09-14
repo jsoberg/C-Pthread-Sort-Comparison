@@ -16,14 +16,14 @@ EXCNAME = a.out
 CC=gcc
 CFLAGS=-I$(INCDIR)
 
-_DEPS = RandomNumberFileGenerator.h
+_DEPS = Logger.h RandomNumberFileGenerator.h
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
-_OBJ = RandomNumberFileGenerator.o Main.o 
+_OBJ = Logger.o RandomNumberFileGenerator.o Main.o 
 OBJ = $(patsubst %,$(BUILDDIR)/%,$(_OBJ))
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c $(DEPS)
-	# Make sure build directory exists.
+	#Make sure build directory exists.
 	mkdir -p $(BUILDDIR)
 	# Building...
 	$(CC) -c -o $@ $< $(CFLAGS)

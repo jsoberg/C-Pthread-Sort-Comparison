@@ -4,6 +4,7 @@
  
 #include <stdio.h>
 #include "RandomNumberFileGenerator.h"
+#include "Logger.h"
 
 /* Generates a file containing a predefined number of
  *		randomly generated integers.
@@ -17,16 +18,18 @@ int generateFileOfRandomNumbers(int minNum, int maxNum, int numsToGenerate, char
 	// Opening file with write permissions.
 	FILE *file = fopen(fileName, "w");
 	// If file is NULL, return 1.
-	if(file == NULL)
+	if(file == NULL) {
+		LogError(__FILE__, __LINE__, "Error opening file. ");
 		return 1;
+	}
 	
-	int randomNum = 0; 
 	// One randomely generated number per line for numsToGenerate iterations.
-	int i;
+	int randomNum, i;
 	for (i = 0; i < numsToGenerate; i++) {
 		randomNum = (rand() % maxNum) + minNum;
 		fprintf(file, "%d\n", randomNum);
 	}
+	
 	int result = fclose(file);
 	return result;
 }

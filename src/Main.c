@@ -5,9 +5,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "RandomNumberFileGenerator.h"
+#include "Logger.h"
 
 // Number of random numbers to generate in file.
-// TODO: RESET THIS TO INDICATED INTEGER (1000000)
+// TODO: RESET THIS TO INDICATED INTEGER (1,000,000)
 const int NUMS_TO_GENERATE = 10;
 // Maximum random number to generate.
 const int MAX_RANDOM_NUM = 1000000;
@@ -19,12 +20,25 @@ char *DEFAULT_FILE_NAME = "RandomNumbers.txt";
 
 int main()
 {
-	printf("Generating file of %d random numbers from [ %d, %d ]\n", NUMS_TO_GENERATE, MIN_RANDOM_NUM, MAX_RANDOM_NUM);
-	int openFileResult = generateFileOfRandomNumbers(MIN_RANDOM_NUM, MAX_RANDOM_NUM, NUMS_TO_GENERATE, DEFAULT_FILE_NAME);
+	int createFileResult = generateFileOfRandomNumbers(MIN_RANDOM_NUM, MAX_RANDOM_NUM, NUMS_TO_GENERATE, DEFAULT_FILE_NAME);
+	LogDebug(__FILE__, DEFAULT_FILE_NAME);
 	
-	// Error opening file, log error and return.
-	if(openFileResult != 0) {
-		fprintf(stderr, "Error generating file.");
-		return 1;
+	// Error creating file, log fatal.
+	if(createFileResult != 0) {
+		LogFatal(__FILE__, __LINE__, "Fatal error generating file.");
 	}
+	
+	// Read permissions required.
+	FILE *file = fopen(DEFAULT_FILE_NAME, "r");	int currentRandNum;
+	
+	// Iterating file for randomely generated integers.
+	while(!feof(file)) {
+		fscanf(file, "%d", &currentRandNum);
+		
+		fprintf(stdout, "Result %d\n", currentRandNum);
+		fflush( stdout );
+	}	
+	fclose(file);
+	
+	return 0;
 }
