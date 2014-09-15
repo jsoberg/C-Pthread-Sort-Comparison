@@ -16,10 +16,10 @@ EXCNAME = a.out
 CC=gcc
 CFLAGS=-I$(INCDIR)
 
-_DEPS = Logger.h RandomNumberFileGenerator.h
+_DEPS = Logger.h RandomNumberFileGenerator.h SorterThread.h
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
-_OBJ = Logger.o RandomNumberFileGenerator.o Main.o 
+_OBJ = Logger.o RandomNumberFileGenerator.o SorterThread.o Main.o 
 OBJ = $(patsubst %,$(BUILDDIR)/%,$(_OBJ))
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c $(DEPS)

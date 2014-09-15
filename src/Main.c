@@ -4,19 +4,30 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "RandomNumberFileGenerator.h"
+#include <string.h>
 #include "Logger.h"
+#include "RandomNumberFileGenerator.h"
+#include "SorterThread.h"
+
+#ifndef MAIN
+#define MAIN
 
 // Number of random numbers to generate in file.
 // TODO: RESET THIS TO INDICATED INTEGER (1,000,000)
-const int NUMS_TO_GENERATE = 10;
+static int NUMS_TO_GENERATE = 100;
 // Maximum random number to generate.
-const int MAX_RANDOM_NUM = 1000000;
+static int MAX_RANDOM_NUM = 1000000;
 // Minimum random number to generate.
-const int MIN_RANDOM_NUM = 0;
+static int MIN_RANDOM_NUM = 0;
 
 // Default file name to use when creating the random numbers file.
 char *DEFAULT_FILE_NAME = "RandomNumbers.txt";
+
+// Test Function Declarations
+
+void printArray(int* nums, int length);
+
+static void sortTest(int* nums, int length);
 
 int main()
 {
@@ -27,18 +38,49 @@ int main()
 	if(createFileResult != 0) {
 		LogFatal(__FILE__, __LINE__, "Fatal error generating file.");
 	}
-	
 	// Read permissions required.
-	FILE *file = fopen(DEFAULT_FILE_NAME, "r");	int currentRandNum;
+	FILE *file = fopen(DEFAULT_FILE_NAME, "r");
 	
+	int nums[NUMS_TO_GENERATE];
+	memset(nums, 0, (NUMS_TO_GENERATE * sizeof(int)));
 	// Iterating file for randomely generated integers.
+	int i = 0;
 	while(!feof(file)) {
-		fscanf(file, "%d", &currentRandNum);
-		
-		fprintf(stdout, "Result %d\n", currentRandNum);
-		fflush( stdout );
-	}	
+		fscanf(file, "%d", &nums[i]);
+		i++;
+	}
 	fclose(file);
+	
+	// Testing. TODO: remove
+	sortTest(nums, LENGTH(nums));
 	
 	return 0;
 }
+
+/* Debug function used to test quick sort implementation. */
+static void sortTest(int* nums, int length)
+{
+	// Print unsorted.
+	printArray(nums, length);
+	// Sort items.
+	sort(nums, length);
+	// Print sorted.
+	printArray(nums, length);
+}
+
+/* Prints the contents of the given array to stdout. */
+void printArray(int* nums, int length)
+{
+	int i;
+	for(i = 0; i < length; i++) {
+		printf("%d", nums[i]);
+		if(i < (length - 1))
+			printf(", ");
+			
+		fflush(stdout);
+	}
+	printf("\n");
+	fflush(stdout);
+}
+
+#endif
