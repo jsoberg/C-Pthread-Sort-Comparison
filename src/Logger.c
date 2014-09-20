@@ -6,7 +6,10 @@
 #include <stdlib.h>
 #include "Logger.h"
 
-// Name of defualt log file.
+// Set this to 1 (true) to log debug/ warning messages; Set to 0 (false) to ONLY log error/ fatal messages.
+static int FLAG_USE_DEBUG = 1;
+
+// Name of default log file.
 static char* LOG_FILE_NAME = "debugLog.log";
 // Debug log message.
 static char* DEBUG = "Debug";
@@ -44,14 +47,18 @@ static void LogMessage(const char* logLevel, char* sourceFileName, int lineNumbe
 /* Prints debug message to logs. */
 void LogDebug(char* sourceFileName, char* debugMessage)
 {
-	// Line number not necessary for debug logs.
-	LogMessage(DEBUG, sourceFileName, 0, debugMessage);
+	if(FLAG_USE_DEBUG == 1) {
+		// Line number not necessary for debug logs.
+		LogMessage(DEBUG, sourceFileName, 0, debugMessage);
+	}
 }
 
 /* Prints warning message to logs. */
 void LogWarning(char* sourceFileName, int lineNumber, char* warningMessage)
 {
-	LogMessage(WARNING, sourceFileName, lineNumber, warningMessage);
+	if(FLAG_USE_DEBUG == 1) {
+		LogMessage(WARNING, sourceFileName, lineNumber, warningMessage);
+	}
 }
 
 /* Prints error message to stderr and logs. */
