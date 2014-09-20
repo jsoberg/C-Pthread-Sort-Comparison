@@ -17,17 +17,27 @@ char *DEFAULT_FILE_NAME = "RandomNumbers.txt";
 
 int main()
 {
-	int createFileResult = generateFileOfRandomNumbers(MIN_RANDOM_NUM, MAX_RANDOM_NUM, NUMS_TO_GENERATE, DEFAULT_FILE_NAME);
-	LogDebug(__FILE__, DEFAULT_FILE_NAME);
+	int nums[NUMS_TO_GENERATE];
+	generateFileAndFillArray(nums, NUMS_TO_GENERATE);
 	
+	// Testing. TODO: remove
+	sortTest(nums, LENGTH(nums));
+	
+	return 0;
+}
+
+void generateFileAndFillArray(int* nums, int numsToGenerate)
+{
+	int createFileResult = generateFileOfRandomNumbers(MIN_RANDOM_NUM, MAX_RANDOM_NUM, numsToGenerate, DEFAULT_FILE_NAME);
+	LogDebug(__FILE__, DEFAULT_FILE_NAME);
 	// Error creating file, log fatal.
 	if(createFileResult != 0) {
 		LogFatal(__FILE__, __LINE__, "Fatal error generating file.");
 	}
+	
 	// Read permissions required.
 	FILE *file = fopen(DEFAULT_FILE_NAME, "r");
-	
-	int nums[NUMS_TO_GENERATE];
+	// Initializing array of random integers.
 	memset(nums, 0, (NUMS_TO_GENERATE * sizeof(int)));
 	// Iterating file for randomely generated integers.
 	int i = 0;
@@ -36,11 +46,6 @@ int main()
 		i++;
 	}
 	fclose(file);
-	
-	// Testing. TODO: remove
-	sortTest(nums, LENGTH(nums));
-	
-	return 0;
 }
 
 /* Debug function used to test quick sort implementation. */
@@ -65,6 +70,7 @@ void printArray(int* nums, int length)
 			
 		fflush(stdout);
 	}
-	printf("\n");
+	// Printing separating line.
+	printf("\n===================\n");
 	fflush(stdout);
 }

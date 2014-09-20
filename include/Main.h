@@ -12,6 +12,12 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+// Function declarations
+
+/* Generates file of numsToGenerate random integers and fill 
+ * 		an array with the generated integers. */
+void generateFileAndFillArray(int* nums, int numsToGenerate);
+
 // Test Function Declarations
 
 void printArray(int* nums, int length);
