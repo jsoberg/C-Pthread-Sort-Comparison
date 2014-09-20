@@ -23,6 +23,8 @@ int generateFileOfRandomNumbers(int minNum, int maxNum, int numsToGenerate, char
 		return 1;
 	}
 	
+	// Creating a random seed.
+	srand( time(NULL) );
 	// One randomely generated number per line for numsToGenerate iterations.
 	int randomNum, i;
 	for (i = 0; i < numsToGenerate; i++) {
