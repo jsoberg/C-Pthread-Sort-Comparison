@@ -1,5 +1,4 @@
 # Joshua Soberg 
-# Template obtained from: 'http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/'
 
 # include directory (Header files).
 INCDIR = ./include
@@ -38,5 +37,5 @@ $(OUTDIR)/$(EXCNAME): $(OBJ)
 .PHONY: clean
 
 clean:
-	# Cleaning up object files and executable.
-	rm -f $(BUILDDIR)/*.o *~ core $(INCDIR)/*~ $(OUTDIR)/$(EXCNAME)
+	# Cleaning up object files and output directory.
+	rm -f $(BUILDDIR)/*.o *~ core $(INCDIR)/*~ $(OUTDIR)/*.*
