@@ -2,7 +2,6 @@
  * CPSC 542
  * Program 1: Master-Slave Application using Pthreads */
  
-#include <stdio.h>
 #include "RandomNumberFileGenerator.h"
 #include "Logger.h"
 

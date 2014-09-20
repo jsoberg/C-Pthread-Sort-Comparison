@@ -2,8 +2,6 @@
  * CPSC 542
  * Program 1: Master-Slave Application using Pthreads */
 
-#include <stdio.h>
-
 /* Sorts an array of integers using the quick sort algorithm. */
 void sort(int *nums, int n) 
 {

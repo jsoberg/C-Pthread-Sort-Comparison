@@ -2,6 +2,8 @@
  * CPSC 542
  * Program 1: Master-Slave Application using Pthreads */
 
+#include <stdio.h>
+
 #ifndef SORTER_THREAD_H
 #define SORTER_THREAD_H
 

@@ -1,9 +1,7 @@
 /* Joshua Soberg
  * CPSC 542
  * Program 1: Master-Slave Application using Pthreads */
- 
-#include <stdio.h>
-#include <stdlib.h>
+
 #include "Logger.h"
 
 // Set this to 1 (true) to log debug/ warning messages; Set to 0 (false) to ONLY log error/ fatal messages.

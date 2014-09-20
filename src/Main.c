@@ -2,15 +2,7 @@
  * CPSC 542
  * Program 1: Master-Slave Application using Pthreads */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "Logger.h"
-#include "RandomNumberFileGenerator.h"
-#include "SorterThread.h"
-
-#ifndef MAIN
-#define MAIN
+#include "Main.h"
 
 // Number of random numbers to generate in file.
 // TODO: RESET THIS TO INDICATED INTEGER (1,000,000)
@@ -22,12 +14,6 @@ static int MIN_RANDOM_NUM = 0;
 
 // Default file name to use when creating the random numbers file.
 char *DEFAULT_FILE_NAME = "RandomNumbers.txt";
-
-// Test Function Declarations
-
-void printArray(int* nums, int length);
-
-static void sortTest(int* nums, int length);
 
 int main()
 {
@@ -82,5 +68,3 @@ void printArray(int* nums, int length)
 	printf("\n");
 	fflush(stdout);
 }
-
-#endif
