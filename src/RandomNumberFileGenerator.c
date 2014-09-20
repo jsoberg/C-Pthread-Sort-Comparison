@@ -24,11 +24,16 @@ int generateFileOfRandomNumbers(int minNum, int maxNum, int numsToGenerate, char
 	
 	// Creating a random seed.
 	srand( time(NULL) );
-	// One randomely generated number per line for numsToGenerate iterations.
+	// Twenty randomely generated numbers per line for numsToGenerate iterations.
 	int randomNum, i;
-	for (i = 0; i < numsToGenerate; i++) {
+	for (i = 1; i <= numsToGenerate; i++) {
 		randomNum = (rand() % maxNum) + minNum;
-		fprintf(file, "%d\n", randomNum);
+		fprintf(file, "%-6d ", randomNum);
+		
+		// Printing newline every 20 integers
+		if((i != 0) && ((i % 20) == 0)) {
+			fprintf(file, "\n");
+		}
 	}
 	
 	int result = fclose(file);
