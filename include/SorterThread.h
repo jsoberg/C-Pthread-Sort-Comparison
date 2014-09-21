@@ -18,12 +18,12 @@ typedef struct {
     int *nums;
     int start;
     int end;
-} ThreadParameters;
+} SortThreadParameters;
 
 // ---------- Function Declaration ----------
 
 /* Function to execute the sort in a thread. */
-void *executeThread(void *params);
+void *executeSortThread(void *params);
 
 /* Sorts an array of integers using the quick sort algorithm. */
 void quickSort(int *nums, int start, int end);

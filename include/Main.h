@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
-#include <pthread.h>
 #include "Logger.h"
 #include "RandomNumberFileGenerator.h"
 #include "SorterThread.h"
@@ -22,6 +21,12 @@ void generateFileAndFillArray(int* nums, int numsToGenerate);
 
 /* Executes sorting threads. Uses numThreads threads. */
 void startSortingThreads(int numThreads, int* array, int arrayLength);
+
+/* Logs the result of a thread action. If unsuccessful, the log will be fatal.
+ * @param result - Result of thread action.
+ * @param threadNum - Thread number. 
+ * @param lineNumber - Line number that action took place. */
+void determineThreadActionResult(int result, int threadNum, int lineNumber);
 
 // Test Function Declarations
 

@@ -25,14 +25,14 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.c $(DEPS)
 	#Make sure build directory exists.
 	mkdir -p $(BUILDDIR)
 	# Building...
-	$(CC) -c -o $@ $< $(CFLAGS) -pthread
+	$(CC) -c -o $@ $< $(CFLAGS) -std=gnu99 -Wpedantic -pthread
 
 # Creating executable.
 $(OUTDIR)/$(EXCNAME): $(OBJ)
 	# Make sure output directory exists.
 	mkdir -p $(OUTDIR)
 	# Building output...
-	$(CC) -o $@ $^ $(CFLAGS) -pthread
+	$(CC) -o $@ $^ $(CFLAGS) -std=gnu99 -Wpedantic -pthread
 
 .PHONY: clean
 

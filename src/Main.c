@@ -20,6 +20,7 @@ char *DEFAULT_FILE_NAME = "RandomNumbers.txt";
 
 int main()
 {
+	// Intializing nums and filling with randomely generated integers.
 	int nums[NUMS_TO_GENERATE];
 	generateFileAndFillArray(nums, NUMS_TO_GENERATE);
 	
@@ -67,22 +68,44 @@ void startSortingThreads(int numThreads, int* array, int arrayLength)
 		int end = ((arrayLength / numThreads) + start) - 1;
 		
 		// Creating parameters for thread to use.
-		ThreadParameters params;
+		SortThreadParameters params;
 		params.nums = array;
 		params.start = start; 
 		params.end = end;
 		
+		int result;
 		// Initializing thread attributes.
-		pthread_attr_init(&threadAttrs[i]);
+		result = pthread_attr_init(&threadAttrs[i]);
+		determineThreadActionResult(result, i, __LINE__);
 		// Creating thread.
-		pthread_create(&threads[i], &threadAttrs[i], executeThread, &params);
+		result = pthread_create(&threads[i], &threadAttrs[i], executeSortThread, &params);
+		determineThreadActionResult(result, i, __LINE__);
 		// Executing thread.
-		pthread_join(threads[i], NULL);
+		result = pthread_join(threads[i], NULL);
+		determineThreadActionResult(result, i, __LINE__);
 		
 		// ---------- DEBUG PRINT ----------
 		printArray(array, start, end);
 		
 		start = (end + 1);
+	}
+}
+
+/* Logs the result of a thread action. If unsuccessful, the log will be fatal.
+ * @param result - Result of thread action.
+ * @param threadNum - Thread number. 
+ * @param lineNumber - Line number that action took place. */
+void determineThreadActionResult(int result, int threadNum, int lineNumber)
+{
+	// Making sure variable has enough buffer to hold the message.
+	char message[100];
+	// Thread action was successful.
+	if(result == 0) {
+		sprintf(message, "Thread %d had a succesful action. ", threadNum);
+		LogDebug(__FILE__, message);
+	} else { // Unsuccessful.
+		sprintf(message, "Thread %d had an unsuccesful action returning a value of %d.", threadNum, result);
+		LogFatal(__FILE__, lineNumber, message);
 	}
 }
 

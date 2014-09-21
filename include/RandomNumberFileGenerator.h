@@ -3,6 +3,7 @@
  * Program 1: Master-Slave Application using Pthreads */
  
 #include <stdio.h>
+#include <time.h>
 
 #ifndef RANDOM_NUMBER_FILE_GENERATOR_H
 #define RANDOM_NUMBER_FILE_GENERATOR_H

@@ -4,10 +4,10 @@
 
 #include "SorterThread.h"
 
-/* Function to execute in a thread. */
-void *executeThread(void *params)
+/* Function to execute sorting in a thread. */
+void *executeSortThread(void *params)
 {
-	ThreadParameters *threadParams = params;
+	SortThreadParameters *threadParams = params;
 	
 	int *nums = threadParams->nums;
 	int start = threadParams->start;
