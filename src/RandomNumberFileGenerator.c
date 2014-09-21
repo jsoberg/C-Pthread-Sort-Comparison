@@ -31,11 +31,10 @@ int generateFileOfRandomNumbers(int minNum, int maxNum, int numsToGenerate, char
 		fprintf(file, "%-6d ", randomNum);
 		
 		// Printing newline every 20 integers
-		if((i != 0) && ((i % 20) == 0)) {
+		if((i % 20) == 0) {
 			fprintf(file, "\n");
 		}
 	}
 	
-	int result = fclose(file);
-	return result;
+	return fclose(file);
 }
