@@ -13,7 +13,7 @@ static int MAX_RANDOM_NUM = 1000000;
 static int MIN_RANDOM_NUM = 0;
 
 // Number of threads to use for each sort iteration.
-static int NUM_THREADS_TO_EXECUTE[6] = { 5, 15, 50, 100, 250, 100 };
+static int NUM_THREADS_TO_EXECUTE[6] = { 5, 15, 50, 100, 250, 1000 };
 
 // Default file name to use when creating the random numbers file.
 char *DEFAULT_FILE_NAME = "RandomNumbers.txt";
@@ -26,6 +26,14 @@ int main()
 	
 	// Testing sorting threads with 5 threads first.
 	startSortingThreads(NUM_THREADS_TO_EXECUTE[0], nums, LENGTH(nums));
+	
+	// Initializing array to hold completely sorted results.
+	int resultArray[LENGTH(nums)];
+	memset(resultArray, 0, (NUMS_TO_GENERATE * sizeof(int)));
+	startMergeThread(NUM_THREADS_TO_EXECUTE[0], nums, resultArray, LENGTH(nums));
+	
+	// ---------- DEBUG PRINT ----------
+	printArray(resultArray, 0, LENGTH(resultArray));
 	
 	return 0;
 }
@@ -54,7 +62,10 @@ void generateFileAndFillArray(int* array, int numsToGenerate)
 	fclose(file);
 }
 
-/* Executes sorting threads. Uses numThreads threads. */
+/* Executes sorting threads. Uses numThreads threads. 
+ * @param numThreads - Number of threads that were executed when sorting the array. 
+ * @param array - Array of random integers to sort.
+ * @param arrayLength - Length of array. */
 void startSortingThreads(int numThreads, int* array, int arrayLength)
 {
 	// Thread identifiers.
@@ -69,9 +80,9 @@ void startSortingThreads(int numThreads, int* array, int arrayLength)
 		
 		// Creating parameters for thread to use.
 		SortThreadParameters params;
-		params.nums = array;
-		params.start = start; 
-		params.end = end;
+			params.nums = array;
+			params.start = start; 
+			params.end = end;
 		
 		int result;
 		// Initializing thread attributes.
@@ -84,11 +95,34 @@ void startSortingThreads(int numThreads, int* array, int arrayLength)
 		result = pthread_join(threads[i], NULL);
 		determineThreadActionResult(result, i, __LINE__);
 		
-		// ---------- DEBUG PRINT ----------
-		printArray(array, start, end);
-		
 		start = (end + 1);
 	}
+}
+
+/* Executes merging thread. 
+ * @param numThreads - Number of threads that were executed when sorting the array. 
+ * @param array - Segmentally sorted array. 
+ * @param resultArray - Array to store merge results. 
+ * @param arrayLength - The length of segmentally sorted array and result array. */
+void startMergeThread(int numThreads, int* array, int* resultArray, int arrayLength)
+{
+	pthread_t mergeThread;
+	pthread_attr_t mergeThreadAttr;
+	
+	// Creating parameters for thread to use.
+	MergeThreadParameters params;
+		params.array = array;
+		params.result = resultArray;
+		params.numSegments = numThreads;
+		params.arrayLength = arrayLength;
+	
+	int result;
+	// Initializing merge thread attributes.
+	result = pthread_attr_init(&mergeThreadAttr);
+	// Creating merge thread.
+	result = pthread_create(&mergeThread, &mergeThreadAttr, executeMergeThread, &params);
+	// Executing merge thread.
+	result = pthread_join(mergeThread, NULL);
 }
 
 /* Logs the result of a thread action. If unsuccessful, the log will be fatal.
@@ -110,17 +144,6 @@ void determineThreadActionResult(int result, int threadNum, int lineNumber)
 }
 
 // ---------- Test Functions ----------
-
-/* Debug function used to test quick sort implementation. */
-static void sortTest(int* nums, int length)
-{
-	// Print unsorted.
-	printArray(nums, 0, length);
-	// Sort items.
-	quickSort(nums, 0, length);
-	// Print sorted.
-	printArray(nums, 0, length);
-}
 
 /* Prints the contents of the given array (from location start to location end) to stdout. */
 void printArray(int* nums, int start, int end)
