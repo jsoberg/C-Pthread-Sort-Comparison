@@ -13,89 +13,99 @@ static int MAX_RANDOM_NUM = 1000000;
 static int MIN_RANDOM_NUM = 0;
 
 // Number of threads to use for each sort iteration.
-static int NUM_THREADS_TO_EXECUTE[6] = { 5, 15, 50, 100, 250, 1000 };
+static int NUM_THREADS_TO_EXECUTE[6] = { 5, 20, 50, 100, 250, 1000 };
 
+// The size each number will be formatted to in the random numbers file.
+static int NUM_FORMAT_WIDTH = 6;
 // Default file name to use when creating the random numbers file.
 char *DEFAULT_FILE_NAME = "RandomNumbers.txt";
 
 int main()
 {
-	// Intializing nums and filling with randomely generated integers.
+	// Intializing nums (parent array).
 	int nums[NUMS_TO_GENERATE];
-	generateFileAndFillArray(nums, NUMS_TO_GENERATE);
+	memset(nums, 0, LENGTH(nums));
+	
+	// Generating file of random integers.
+	generateRandomFile(NUMS_TO_GENERATE, NUM_FORMAT_WIDTH);
 	
 	// Testing sorting threads with 5 threads first.
-	startSortingThreads(NUM_THREADS_TO_EXECUTE[0], nums, LENGTH(nums));
+	startSortingThreads(NUM_THREADS_TO_EXECUTE[1], nums, LENGTH(nums), DEFAULT_FILE_NAME);
 	
 	// Initializing array to hold completely sorted results.
 	int resultArray[LENGTH(nums)];
-	memset(resultArray, 0, (NUMS_TO_GENERATE * sizeof(int)));
-	startMergeThread(NUM_THREADS_TO_EXECUTE[0], nums, resultArray, LENGTH(nums));
+	memset(resultArray, 0, LENGTH(resultArray));
+	startMergeThread(NUM_THREADS_TO_EXECUTE[1], nums, resultArray, LENGTH(nums));
 	
 	// ---------- DEBUG PRINT ----------
 	printArray(resultArray, 0, LENGTH(resultArray));
 	
+	printf("\n\n Largest value: %d \n\n", getLargestValue());
+	
+	// Destroying shared memory values.
+	deconstructSharedMemoryValues();
+	
 	return 0;
 }
 
-/* Generates file of numsToGenerate random integers and fill 
- * 		array with the generated integers. */
-void generateFileAndFillArray(int* array, int numsToGenerate)
+/* Generates file of numsToGenerate random integers with each integer
+ * 		being formatted to a width of numFormatWidth. */
+void generateRandomFile(int numsToGenerate, int numFormatWidth)
 {
-	int createFileResult = generateFileOfRandomNumbers(MIN_RANDOM_NUM, MAX_RANDOM_NUM, numsToGenerate, DEFAULT_FILE_NAME);
+	int createFileResult = generateFileOfRandomNumbers(MIN_RANDOM_NUM, MAX_RANDOM_NUM, numsToGenerate, numFormatWidth, DEFAULT_FILE_NAME);
 	LogDebug(__FILE__, DEFAULT_FILE_NAME);
 	// Error creating file, log fatal.
 	if(createFileResult != 0) {
 		LogFatal(__FILE__, __LINE__, "Fatal error generating file.");
 	}
-	
-	// Read permissions required.
-	FILE *file = fopen(DEFAULT_FILE_NAME, "r");
-	// Initializing array of random integers.
-	memset(array, 0, (NUMS_TO_GENERATE * sizeof(int)));
-	// Iterating file for randomely generated integers.
-	int i = 0;
-	while(!feof(file)) {
-		fscanf(file, "%d", &array[i]);
-		i++;
-	}
-	fclose(file);
 }
 
 /* Executes sorting threads. Uses numThreads threads. 
  * @param numThreads - Number of threads that were executed when sorting the array. 
  * @param array - Array of random integers to sort.
- * @param arrayLength - Length of array. */
-void startSortingThreads(int numThreads, int* array, int arrayLength)
+ * @param arrayLength - Length of array. 
+ * @param fileName - Name of file to read. */
+void startSortingThreads(int numThreads, int* array, int arrayLength, char* fileName)
 {
 	// Thread identifiers.
 	pthread_t threads[numThreads];
 	// Thread attributes.
 	pthread_attr_t threadAttrs[numThreads];
 	
+	// Result of thread action.
+	int result;
+	// Making sure variable has enough buffer to hold the log message.
+	char message[100];
+		
 	int i, start = 0;
 	for(i = 0; i < numThreads; i ++) {
 		// Create parameters to send to thread.
-		int end = ((arrayLength / numThreads) + start) - 1;
+		int end = ( (arrayLength / numThreads) + start) - 1;
 		
 		// Creating parameters for thread to use.
 		SortThreadParameters params;
-			params.nums = array;
+			params.parentArray = array;
 			params.start = start; 
 			params.end = end;
+			params.fileName = fileName;
 		
-		int result;
 		// Initializing thread attributes.
+		sprintf(message, "Thread %d is being initialized. ", i);
 		result = pthread_attr_init(&threadAttrs[i]);
-		determineThreadActionResult(result, i, __LINE__);
+		logThreadActionResult(result, __LINE__, message);
 		// Creating thread.
+		sprintf(message, "Thread %d is being created. Start value: %d, End value: %d ", i, start, end);
 		result = pthread_create(&threads[i], &threadAttrs[i], executeSortThread, &params);
-		determineThreadActionResult(result, i, __LINE__);
-		// Executing thread.
-		result = pthread_join(threads[i], NULL);
-		determineThreadActionResult(result, i, __LINE__);
+		logThreadActionResult(result, __LINE__, message);
 		
 		start = (end + 1);
+	}
+	
+	// Joining threads.
+	for(i = 0; i < numThreads; i ++) {
+		sprintf(message, "Thread %d is being joined. ", i);
+		result = pthread_join(threads[i], NULL);
+		logThreadActionResult(result, __LINE__, message);
 	}
 }
 
@@ -127,18 +137,14 @@ void startMergeThread(int numThreads, int* array, int* resultArray, int arrayLen
 
 /* Logs the result of a thread action. If unsuccessful, the log will be fatal.
  * @param result - Result of thread action.
- * @param threadNum - Thread number. 
- * @param lineNumber - Line number that action took place. */
-void determineThreadActionResult(int result, int threadNum, int lineNumber)
+ * @param lineNumber - Line number that action took place. 
+ * @param message - Message to log. */
+void logThreadActionResult(int result, int lineNumber, char* message)
 {
-	// Making sure variable has enough buffer to hold the message.
-	char message[100];
 	// Thread action was successful.
 	if(result == 0) {
-		sprintf(message, "Thread %d had a succesful action. ", threadNum);
 		LogDebug(__FILE__, message);
 	} else { // Unsuccessful.
-		sprintf(message, "Thread %d had an unsuccesful action returning a value of %d.", threadNum, result);
 		LogFatal(__FILE__, lineNumber, message);
 	}
 }

@@ -6,24 +6,27 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <math.h>
 #include "Logger.h"
 #include "RandomNumberFileGenerator.h"
 #include "SorterThread.h"
+#include "SharedMemoryController.h"
 
 #ifndef MAIN_H
 #define MAIN_H
 
 // Function declarations
 
-/* Generates file of numsToGenerate random integers and fill 
- * 		nums with the generated integers. */
-void generateFileAndFillArray(int* nums, int numsToGenerate);
+/* Generates file of numsToGenerate random integers with each integer
+ * 		being formatted to a width of numFormatWidth. */
+void generateRandomFile(int numsToGenerate, int numFormatWidth);
 
 /* Executes sorting threads. Uses numThreads threads. 
  * @param numThreads - Number of threads that were executed when sorting the array. 
  * @param array - Array of random integers to sort.
- * @param arrayLength - Length of array. */
-void startSortingThreads(int numThreads, int* array, int arrayLength);
+ * @param arrayLength - Length of array. 
+ * @param fileName - Name of file to read. */
+void startSortingThreads(int numThreads, int* array, int arrayLength, char* fileName);
 
 /* Executes merging thread. 
  * @param numThreads - Number of threads that were executed when sorting the array. 
@@ -34,9 +37,9 @@ void startMergeThread(int numThreads, int* array, int* resultArray, int arrayLen
 
 /* Logs the result of a thread action. If unsuccessful, the log will be fatal.
  * @param result - Result of thread action.
- * @param threadNum - Thread number. 
- * @param lineNumber - Line number that action took place. */
-void determineThreadActionResult(int result, int threadNum, int lineNumber);
+ * @param lineNumber - Line number that action took place. 
+ * @param message - Message to log. */
+void logThreadActionResult(int result, int lineNumber, char* message);
 
 // Test Function Declarations
 

@@ -15,24 +15,24 @@ EXCNAME = a.out
 CC=gcc
 CFLAGS=-I$(INCDIR)
 
-_DEPS = Logger.h RandomNumberFileGenerator.h SorterThread.h
+_DEPS = Logger.h RandomNumberFileGenerator.h SorterThread.h SharedMemoryController.h
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
-_OBJ = Logger.o RandomNumberFileGenerator.o SorterThread.o Main.o 
+_OBJ = Logger.o RandomNumberFileGenerator.o SorterThread.o Main.o SharedMemoryController.o
 OBJ = $(patsubst %,$(BUILDDIR)/%,$(_OBJ))
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c $(DEPS)
 	#Make sure build directory exists.
 	mkdir -p $(BUILDDIR)
 	# Building...
-	$(CC) -c -o $@ $< $(CFLAGS) -std=gnu99 -Wpedantic -pthread
+	$(CC) -lm -c -o $@ $< $(CFLAGS) -std=gnu99 -Wpedantic -pthread
 
 # Creating executable.
 $(OUTDIR)/$(EXCNAME): $(OBJ)
 	# Make sure output directory exists.
 	mkdir -p $(OUTDIR)
 	# Building output...
-	$(CC) -o $@ $^ $(CFLAGS) -std=gnu99 -Wpedantic -pthread
+	$(CC) -lm -o $@ $^ $(CFLAGS) -std=gnu99 -Wpedantic -pthread
 
 .PHONY: clean
 

@@ -3,16 +3,16 @@
  * Program 1: Master-Slave Application using Pthreads */
  
 #include "RandomNumberFileGenerator.h"
-#include "Logger.h"
 
 /* Generates a file containing a predefined number of
  *		randomly generated integers.
  * @param minNum - Minimum number to generate.
  * @param maxNum - Maximum number to generate.
  * @param numtsoGenerate - Number of random numbers to generate in the file.
+ * @param numFormatWidth - Used to format the length of each number when printing to the file.
  * @param fileName - Name of file to be created.
  * @return - The result of the file being closed. */	
-int generateFileOfRandomNumbers(int minNum, int maxNum, int numsToGenerate, char* fileName) 
+int generateFileOfRandomNumbers(int minNum, int maxNum, int numsToGenerate, int numFormatWidth, char* fileName) 
 {
 	// Opening file with write permissions.
 	FILE *file = fopen(fileName, "w");
@@ -28,7 +28,7 @@ int generateFileOfRandomNumbers(int minNum, int maxNum, int numsToGenerate, char
 	int randomNum, i;
 	for (i = 1; i <= numsToGenerate; i++) {
 		randomNum = (rand() % maxNum) + minNum;
-		fprintf(file, "%-6d ", randomNum);
+		fprintf(file, "%-*d ", numFormatWidth, randomNum);
 		
 		// Printing newline every 20 integers
 		if((i % 20) == 0) {
