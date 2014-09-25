@@ -5,8 +5,7 @@
 #include "Main.h"
 
 // Number of random numbers to generate in file.
-// TODO: RESET THIS TO INDICATED INTEGER (1,000,000)
-static int NUMS_TO_GENERATE = 1000;
+static int NUMS_TO_GENERATE = 1000000;
 // Maximum random number to generate.
 static int MAX_RANDOM_NUM = 1000000;
 // Minimum random number to generate.
@@ -19,28 +18,48 @@ static int NUM_THREADS_TO_EXECUTE[6] = { 5, 20, 50, 100, 250, 1000 };
 static int NUM_FORMAT_WIDTH = 6;
 // Default file name to use when creating the random numbers file.
 char *DEFAULT_FILE_NAME = "RandomNumbers.txt";
+// Default file name to use when creating file to store sorted numbers.
+char *DEFAULT_RESULT_FILE_NAME = "Sorted";
 
 int main()
 {
-	// Intializing nums (parent array).
-	int nums[NUMS_TO_GENERATE];
-	memset(nums, 0, LENGTH(nums));
-	
-	// Generating file of random integers.
-	generateRandomFile(NUMS_TO_GENERATE, NUM_FORMAT_WIDTH);
-	
-	// Testing sorting threads with 5 threads first.
-	startSortingThreads(NUM_THREADS_TO_EXECUTE[1], nums, LENGTH(nums), DEFAULT_FILE_NAME);
-	
-	// Initializing array to hold completely sorted results.
-	int resultArray[LENGTH(nums)];
-	memset(resultArray, 0, LENGTH(resultArray));
-	startMergeThread(NUM_THREADS_TO_EXECUTE[1], nums, resultArray, LENGTH(nums));
-	
-	// ---------- DEBUG PRINT ----------
-	printArray(resultArray, 0, LENGTH(resultArray));
-	
-	printf("\n\n Largest value: %d \n\n", getLargestValue());
+	int i;
+	for(i = 0; i < LENGTH(NUM_THREADS_TO_EXECUTE); i ++) {
+		
+		printf("\n\nOutput for %d threads sorting %d random integers\n==============================================================\n", NUM_THREADS_TO_EXECUTE[i], NUMS_TO_GENERATE);
+		
+		// Initializing shared memory values.
+		resetSharedMemoryValues();
+		// Intializing nums (parent array).
+		int nums[NUMS_TO_GENERATE];
+		memset(nums, 0, LENGTH(nums));
+		// Generating file of random integers.
+		generateRandomFile(NUMS_TO_GENERATE, NUM_FORMAT_WIDTH);
+		
+		// Storing time of thread initialization.
+		clock_t startTime = clock();
+		
+		// Testing sorting threads with 5 threads first.
+		startSortingThreads(NUM_THREADS_TO_EXECUTE[i], nums, LENGTH(nums), DEFAULT_FILE_NAME);
+		// Initializing array to hold completely sorted results and merging.
+		int resultArray[LENGTH(nums)];
+		memset(resultArray, 0, LENGTH(resultArray));
+		startMergeThread(NUM_THREADS_TO_EXECUTE[i], nums, resultArray, LENGTH(nums));
+		
+		// Storing time of thread completion.
+		clock_t endTime = clock();
+		
+		// Printing time to execute
+		printf("\n Seconds to execute %d threads: %f\n", NUM_THREADS_TO_EXECUTE[i], ((endTime - startTime)/((double) CLOCKS_PER_SEC)));
+		
+		printf(" Largest value of entire set: %d \n", getLargestValue());
+		fflush( stdout );
+		
+		// Printing sorted results to file.
+		char fileName[100];
+		sprintf(fileName, "SortedResult-%dIntegers-%dThreads.txt", NUMS_TO_GENERATE, NUM_THREADS_TO_EXECUTE[i]);
+		printArrayToFile(fileName, resultArray, 0, LENGTH(resultArray));
+	}
 	
 	// Destroying shared memory values.
 	deconstructSharedMemoryValues();
@@ -73,7 +92,7 @@ void startSortingThreads(int numThreads, int* array, int arrayLength, char* file
 	pthread_attr_t threadAttrs[numThreads];
 	
 	// Result of thread action.
-	int result;
+	int result;	
 	// Making sure variable has enough buffer to hold the log message.
 	char message[100];
 		
@@ -90,11 +109,11 @@ void startSortingThreads(int numThreads, int* array, int arrayLength, char* file
 			params.fileName = fileName;
 		
 		// Initializing thread attributes.
-		sprintf(message, "Thread %d is being initialized. ", i);
+		sprintf(message, "Sort thread %d is being initialized. ", i);
 		result = pthread_attr_init(&threadAttrs[i]);
 		logThreadActionResult(result, __LINE__, message);
 		// Creating thread.
-		sprintf(message, "Thread %d is being created. Start value: %d, End value: %d ", i, start, end);
+		sprintf(message, "Sort thread %d is being created. Start value: %d, End value: %d ", i, start, end);
 		result = pthread_create(&threads[i], &threadAttrs[i], executeSortThread, &params);
 		logThreadActionResult(result, __LINE__, message);
 		
@@ -103,7 +122,7 @@ void startSortingThreads(int numThreads, int* array, int arrayLength, char* file
 	
 	// Joining threads.
 	for(i = 0; i < numThreads; i ++) {
-		sprintf(message, "Thread %d is being joined. ", i);
+		sprintf(message, "Sort thread %d is being joined. ", i);
 		result = pthread_join(threads[i], NULL);
 		logThreadActionResult(result, __LINE__, message);
 	}
@@ -126,13 +145,22 @@ void startMergeThread(int numThreads, int* array, int* resultArray, int arrayLen
 		params.numSegments = numThreads;
 		params.arrayLength = arrayLength;
 	
+	// Making sure variable has enough buffer to hold the log message.
+	char message[100];
+	
 	int result;
 	// Initializing merge thread attributes.
+	sprintf(message, "Merge thread is being initialized. ");
 	result = pthread_attr_init(&mergeThreadAttr);
+	logThreadActionResult(result, __LINE__, message);
 	// Creating merge thread.
+	sprintf(message, "Merge thread is being created. ");
 	result = pthread_create(&mergeThread, &mergeThreadAttr, executeMergeThread, &params);
+	logThreadActionResult(result, __LINE__, message);
 	// Executing merge thread.
+	sprintf(message, "Merge thread is being joined. ");
 	result = pthread_join(mergeThread, NULL);
+	logThreadActionResult(result, __LINE__, message);
 }
 
 /* Logs the result of a thread action. If unsuccessful, the log will be fatal.
@@ -149,29 +177,39 @@ void logThreadActionResult(int result, int lineNumber, char* message)
 	}
 }
 
-// ---------- Test Functions ----------
-
-/* Prints the contents of the given array (from location start to location end) to stdout. */
-void printArray(int* nums, int start, int end)
+/* Prints the contents of the given array (from location start to location end) to a file. */
+int printArrayToFile(char* fileName, int* nums, int start, int end)
 {
+	// Opening file with write permissions.
+	FILE *file = fopen(fileName, "w");
+	// If file is NULL, return 1.
+	if(file == NULL) {
+		LogError(__FILE__, __LINE__, "Error opening file. ");
+		return 1;
+	}
+	
+	int i;
+	fprintf(file, "Sorted output: \n");
+	for(i = 70; i --; fprintf(file, "="));
+	fprintf(file, "\n");
+	
 	// Keep track of how many items have been printed.
 	int printCount = 1;
 	
-	int i;
 	for(i = start + 1; i <= end; i++) {
-		printf("%6d", nums[i - 1]);
+		fprintf(file, "%6d", nums[i - 1]);
 		// Print "," after every entry except for the last.
-		if(i < end) { printf(", "); }
+		if(i < end) { fprintf(file, ", "); }
 		// New line every 9 entries.
 		if((printCount % 9) == 0)
-			printf("\n");
+			fprintf(file, "\n");
 		
-		fflush(stdout);
 		printCount ++;
 	}
 	// Printing separating line.
-	printf("\n");
-	for(i = 70; i --; printf("="));
-	printf("\n");
-	fflush(stdout);
+	fprintf(file, "\n");
+	for(i = 70; i --; fprintf(file, "="));
+	fprintf(file, "\n");
+	
+	return fclose(file);
 }

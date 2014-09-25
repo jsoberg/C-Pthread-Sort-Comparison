@@ -8,7 +8,7 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-// Function declaration.
+// ==================== Function Declarations ====================
 
 /* Prints message to a log file. */
 static void LogMessage(const char* logLevel, char* sourceFileName, int lineNumber, char* message);

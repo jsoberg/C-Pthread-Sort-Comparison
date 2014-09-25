@@ -68,7 +68,7 @@ void fillStartLocationsArrayForSegments(int *sortedSegments, int numSegments, in
 
 /* Function to execute sorting in a thread. */
 void *executeSortThread(void *params)
-{
+{	
 	SortThreadParameters *threadParams = params;
 		int *parentArray = threadParams->parentArray;
 		int start = threadParams->start;
@@ -90,6 +90,11 @@ void *executeSortThread(void *params)
 	/* Checking for largest value. Since this segment of the list is now sorted, 
 	 * 		the largest value will be the last number in this segment. */
 	designateLargestValue(resultArray[resultArrayLength - 1]);
+	
+	// Printing results of smallest/ largest threads in system.
+	printf("\n    Smallest value of thread #%d: %d \n", pthread_self(), resultArray[0]);
+	printf("    Largest value of thread #%d: %d \n", pthread_self(), resultArray[resultArrayLength - 1]);
+	fflush( stdout );
 	
 	// Storing results into parent.
 	storeSortedResultsIntoParentArray(parentArray, resultArray, start, end);

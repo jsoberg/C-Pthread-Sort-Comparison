@@ -5,7 +5,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <math.h>
+#include <pthread.h>
+#include <time.h>
+#include <sys/types.h>
 #include "SharedMemoryController.h"
 
 #ifndef SORTER_THREAD_H

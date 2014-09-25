@@ -12,6 +12,9 @@
 
 // ---------- Shared Memory Function Declarations ----------
 
+/* Resets shared memory values. */
+void resetSharedMemoryValues();
+
 /* Indicates the largest values across all threads. 
  * 		Uses a mutex to insure only one thread at a time can access. */
 void designateLargestValue(int largest);

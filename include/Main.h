@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
-#include <math.h>
 #include "Logger.h"
 #include "RandomNumberFileGenerator.h"
 #include "SorterThread.h"
@@ -41,8 +40,7 @@ void startMergeThread(int numThreads, int* array, int* resultArray, int arrayLen
  * @param message - Message to log. */
 void logThreadActionResult(int result, int lineNumber, char* message);
 
-// Test Function Declarations
-
-void printArray(int* nums, int start, int end);
+/* Prints the contents of the given array (from location start to location end) to a file. */
+int printArrayToFile(char* fileName, int* nums, int start, int end);
 
 #endif

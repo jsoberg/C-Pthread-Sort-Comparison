@@ -63,7 +63,7 @@ void LogWarning(char* sourceFileName, int lineNumber, char* warningMessage)
 void LogError(char* sourceFileName, int lineNumber, char* errorMessage)
 {
 	// Printing error message to stderr.
-	fprintf(stderr, errorMessage);
+	fprintf(stderr, "ERROR\n");
 	fflush( stderr );
 	
 	// Logging error message to log.
@@ -74,7 +74,7 @@ void LogError(char* sourceFileName, int lineNumber, char* errorMessage)
 void LogFatal(char* sourceFileName, int lineNumber, char* fatalMessage)
 {
 	// Printing fatal message to stderr.
-	fprintf(stderr, fatalMessage);
+	fprintf(stderr, "FATAL ERROR\n");
 	fflush( stderr );
 	
 	// Logging error message to log.
