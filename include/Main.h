@@ -15,7 +15,10 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-// Function declarations
+// ==================== Function Declarations ====================
+
+/* Executes the program fully (sorting and merging). */
+void executeProgram(int numsToGenerate, int numThreadsToExecute);
 
 /* Generates file of numsToGenerate random integers with each integer
  * 		being formatted to a width of numFormatWidth. */

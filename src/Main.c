@@ -21,50 +21,66 @@ char *DEFAULT_FILE_NAME = "RandomNumbers.txt";
 // Default file name to use when creating file to store sorted numbers.
 char *DEFAULT_RESULT_FILE_NAME = "Sorted";
 
-int main()
+int main(int argc, char **argv)
 {
-	int i;
-	for(i = 0; i < LENGTH(NUM_THREADS_TO_EXECUTE); i ++) {
+	if (argc != 3) {
+		fprintf(stdout, "No input values or incorrect amount of input values detected, run automatic script. ");
 		
-		printf("\n\nOutput for %d threads sorting %d random integers\n==============================================================\n", NUM_THREADS_TO_EXECUTE[i], NUMS_TO_GENERATE);
+		// If correct values aren't input, run auto script.
+		int i;
+		for(i = 0; i < LENGTH(NUM_THREADS_TO_EXECUTE); i ++) {
+			executeProgram(NUMS_TO_GENERATE, NUM_THREADS_TO_EXECUTE[i]);
+		}
+
+		// Destroying shared memory values.
+		deconstructSharedMemoryValues();
+	} else { // Input parameters were given.
+		executeProgram(atoi(argv[2]), atoi(argv[1]));
+	}	
+	
+	return 0;
+}
+
+/* Executes the program fully (sorting and merging). */
+void executeProgram(int numsToGenerate, int numThreadsToExecute)
+{
+	printf("\n\nOutput for %d threads sorting %d random integers\n==============================================================\n", numThreadsToExecute, numsToGenerate);
 		
 		// Initializing shared memory values.
 		resetSharedMemoryValues();
 		// Intializing nums (parent array).
-		int nums[NUMS_TO_GENERATE];
+		int nums[numsToGenerate];
 		memset(nums, 0, LENGTH(nums));
 		// Generating file of random integers.
-		generateRandomFile(NUMS_TO_GENERATE, NUM_FORMAT_WIDTH);
+		generateRandomFile(numsToGenerate, NUM_FORMAT_WIDTH);
 		
 		// Storing time of thread initialization.
 		clock_t startTime = clock();
 		
 		// Sorting.
-		startSortingThreads(NUM_THREADS_TO_EXECUTE[i], nums, LENGTH(nums), DEFAULT_FILE_NAME);
+		startSortingThreads(numThreadsToExecute, nums, LENGTH(nums), DEFAULT_FILE_NAME);
 		// Initializing array to hold completely sorted results and merging.
 		int resultArray[LENGTH(nums)];
 		memset(resultArray, 0, LENGTH(resultArray));
-		startMergeThread(NUM_THREADS_TO_EXECUTE[i], nums, resultArray, LENGTH(nums));
+		startMergeThread(numThreadsToExecute, nums, resultArray, LENGTH(nums));
 		
 		// Storing time of thread completion.
 		clock_t endTime = clock();
 		
 		// Printing time to execute
-		printf("\n Seconds to execute %d threads: %f\n", NUM_THREADS_TO_EXECUTE[i], ((endTime - startTime)/((double) CLOCKS_PER_SEC)));
+		printf("\n Seconds to execute %d threads: %f\n", numThreadsToExecute, ((endTime - startTime)/((double) CLOCKS_PER_SEC)));
 		
 		printf(" Largest value of entire set: %d \n", getLargestValue());
 		fflush( stdout );
 		
 		// Printing sorted results to file.
 		char fileName[100];
-		sprintf(fileName, "SortedResult-%dIntegers-%dThreads.txt", NUMS_TO_GENERATE, NUM_THREADS_TO_EXECUTE[i]);
+		sprintf(fileName, "SortedResult-%dIntegers-%dThreads.txt", numsToGenerate, numThreadsToExecute);
 		printArrayToFile(fileName, resultArray, 0, LENGTH(resultArray));
-	}
-	
-	// Destroying shared memory values.
-	deconstructSharedMemoryValues();
-	
-	return 0;
+		
+		// Printing file name.
+		printf("\n Sorted output can be found in %s.", fileName);
+		fflush( stdout );
 }
 
 /* Generates file of numsToGenerate random integers with each integer
