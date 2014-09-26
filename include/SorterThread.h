@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <time.h>
+#include <math.h>
 #include <sys/types.h>
 #include "SharedMemoryController.h"
 
@@ -51,9 +52,9 @@ void *executeMergeThread(void *params);
  * 		storing the complete sorted array in result. */
 void merge(int *nums, int *result, int numSegments, int length);
 
-/* Fills sortedSegments with start locations for the calculated sorted segments 
+/* Fills sortedSegments with start  and end locations for the calculated sorted segments 
  * 		in the segmentally sorted array. */
-void fillStartLocationsArrayForSegments(int *sortedSegments, int numSegments, int arrayLength);
+void fillStartAndEndLocationsArrayForSegments(int *startSegments, int *endSegments, int numSegments, int arrayLength);
 
 /* Function to execute the sort in a thread. */
 void *executeSortThread(void *params);

@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <math.h>
 #include "Logger.h"
 #include "RandomNumberFileGenerator.h"
 #include "SorterThread.h"

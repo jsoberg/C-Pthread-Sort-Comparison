@@ -14,9 +14,9 @@ static char* DEBUG = "Debug";
 // Warning log message.
 static char* WARNING = "Warning";
 // Error log message.
-static char* ERROR = "Error";
+static char* ERROR = "ERROR";
 // Fatal log message.
-static char* FATAL = "Fatal";
+static char* FATAL = "FATAL";
 
 /* Prints message to a log file. 
  * @param logLevel - The log level of this message (DEBUG, WARNING, ERROR, FATAL)

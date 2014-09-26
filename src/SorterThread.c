@@ -25,42 +25,50 @@ void *executeMergeThread(void *params)
 void merge(int *nums, int *result, int numSegments, int length)
 {
 	// Length of each sorted segment in nums.
-	int segmentLength = (length / numSegments);
+	int segmentLength = floor(length / numSegments);
 	
 	// Creating array for start location of segments.
-	int sortedSegments[numSegments];
-	memset(sortedSegments, 0, LENGTH(sortedSegments));
-	fillStartLocationsArrayForSegments(sortedSegments, numSegments, length);
+	int startSegments[numSegments];
+	memset(startSegments, 0, LENGTH(startSegments));
+	// Creating array for end location of segments.
+	int endSegments[numSegments];
+	memset(endSegments, 0, LENGTH(endSegments));
+	fillStartAndEndLocationsArrayForSegments(startSegments, endSegments, numSegments, length);
 	
 	int i;
 	for(i = 0; i < length; i ++) {
 		
 		int j;
 		int lowestLoc = -1;
-		for(j = 0; j < LENGTH(sortedSegments); j ++) {
+		for(j = 0; j < LENGTH(startSegments); j ++) {
 			// This segment has been traversed, ignore it.
-			if(sortedSegments[j] >= ((segmentLength) * (j + 1)) )
+			if(startSegments[j] >= endSegments[j] )
 				continue;
 			
 			// Checking if a lower number has been found, or if this is the first comparison for this iteration.
-			if( (lowestLoc == -1) || (nums[sortedSegments[j]] <= nums[sortedSegments[lowestLoc]]) ) {
+			if( (lowestLoc == -1) || (nums[startSegments[j]] <= nums[startSegments[lowestLoc]]) ) {
 				lowestLoc = j;
 			}
 		}
 		
 		// Storing result and iterating through segment.
-		result[i] = nums[sortedSegments[lowestLoc]];
-		sortedSegments[lowestLoc] += 1;
+		result[i] = nums[startSegments[lowestLoc]];
+		startSegments[lowestLoc] += 1;
 	}
 }
 
 /* Fills sortedSegments with start locations for the calculated sorted segments 
  * 		in the segmentally sorted array. */
-void fillStartLocationsArrayForSegments(int *sortedSegments, int numSegments, int arrayLength)
+void fillStartAndEndLocationsArrayForSegments(int *startSegments, int *endSegments, int numSegments, int arrayLength)
 {
 	int i;
 	for(i = 0; i < numSegments; i ++) {
-		sortedSegments[i] = ( (arrayLength / numSegments) * i);
+		startSegments[i] = ( floor(arrayLength / numSegments) * i);
+		if(i < (numSegments - 1)) {
+			endSegments[i] = ( floor(arrayLength / numSegments) * (i + 1));
+		} else { // Last segment may be larger/ smaller than the other segments.
+			endSegments[i] = arrayLength;
+		}
 	}
 }
 
@@ -75,7 +83,7 @@ void *executeSortThread(void *params)
 		int end = threadParams->end;
 		char *fileName = threadParams->fileName;
 	
-	int resultArrayLength = ((end - start) + 1);
+	int resultArrayLength = (floor(end - start) + 1);
 	
 	// Initializing array of random integers.
 	int resultArray[resultArrayLength];

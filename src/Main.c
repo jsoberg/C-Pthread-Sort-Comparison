@@ -12,7 +12,7 @@ static int MAX_RANDOM_NUM = 1000000;
 static int MIN_RANDOM_NUM = 0;
 
 // Number of threads to use for each sort iteration.
-static int NUM_THREADS_TO_EXECUTE[6] = { 5, 20, 50, 100, 250, 1000 };
+static int NUM_THREADS_TO_EXECUTE[6] = { 5, 15, 50, 100, 250, 1000 };
 
 // The size each number will be formatted to in the random numbers file.
 static int NUM_FORMAT_WIDTH = 6;
@@ -39,7 +39,7 @@ int main()
 		// Storing time of thread initialization.
 		clock_t startTime = clock();
 		
-		// Testing sorting threads with 5 threads first.
+		// Sorting.
 		startSortingThreads(NUM_THREADS_TO_EXECUTE[i], nums, LENGTH(nums), DEFAULT_FILE_NAME);
 		// Initializing array to hold completely sorted results and merging.
 		int resultArray[LENGTH(nums)];
@@ -90,6 +90,8 @@ void startSortingThreads(int numThreads, int* array, int arrayLength, char* file
 	pthread_t threads[numThreads];
 	// Thread attributes.
 	pthread_attr_t threadAttrs[numThreads];
+	// Thread parameters.
+	SortThreadParameters params[numThreads];
 	
 	// Result of thread action.
 	int result;	
@@ -99,25 +101,31 @@ void startSortingThreads(int numThreads, int* array, int arrayLength, char* file
 	int i, start = 0;
 	for(i = 0; i < numThreads; i ++) {
 		// Create parameters to send to thread.
-		int end = ( (arrayLength / numThreads) + start) - 1;
+		int end;
+		if(i < (numThreads - 1)) {
+			end = (floor(arrayLength / numThreads) + start) - 1;
+		} else { // For the last thread, check if there are more items than usual to sort.
+			end = arrayLength - 1;
+		}
 		
 		// Creating parameters for thread to use.
-		SortThreadParameters params;
-			params.parentArray = array;
-			params.start = start; 
-			params.end = end;
-			params.fileName = fileName;
+		params[i].parentArray = array;
+		params[i].start = start; 
+		params[i].end = end;
+		params[i].fileName = fileName;
 		
+		start = (end + 1);
+	}
+	
+	for(i = 0; i < numThreads; i ++) {
 		// Initializing thread attributes.
 		sprintf(message, "Sort thread %d is being initialized. ", i);
 		result = pthread_attr_init(&threadAttrs[i]);
 		logThreadActionResult(result, __LINE__, message);
 		// Creating thread.
-		sprintf(message, "Sort thread %d is being created. Start value: %d, End value: %d ", i, start, end);
-		result = pthread_create(&threads[i], &threadAttrs[i], executeSortThread, &params);
+		sprintf(message, "Sort thread %d is being created.", i);
+		result = pthread_create(&threads[i], &threadAttrs[i], executeSortThread, &params[i]);
 		logThreadActionResult(result, __LINE__, message);
-		
-		start = (end + 1);
 	}
 	
 	// Joining threads.
@@ -200,8 +208,8 @@ int printArrayToFile(char* fileName, int* nums, int start, int end)
 		fprintf(file, "%6d", nums[i - 1]);
 		// Print "," after every entry except for the last.
 		if(i < end) { fprintf(file, ", "); }
-		// New line every 9 entries.
-		if((printCount % 9) == 0)
+		// New line every 20 entries.
+		if((printCount % 20) == 0)
 			fprintf(file, "\n");
 		
 		printCount ++;
