@@ -35,6 +35,8 @@ void designateLargestValue(int largest)
 	determineMutexActionResult(result, __LINE__);
 }
 
+/* Fills an array with integers from file fileName from a specified start location to a 
+ * 		specified end location. */
 void fillArrayFromFile(int *array, char* fileName, int startLoc, int valuesToRead)
 {
 	// Value to hold result of mutex action.
@@ -65,6 +67,7 @@ void fillArrayFromFile(int *array, char* fileName, int startLoc, int valuesToRea
 	determineMutexActionResult(result, __LINE__);
 }
 
+/* Stores sorted results in corresponding area of parent array. */
 void storeSortedResultsIntoParentArray(int *parentArray, int *resultArray, int start, int end)
 {
 	// Value to hold result of mutex action.

@@ -17,6 +17,13 @@
 
 // ==================== Function Declarations ====================
 
+/* Prompts user to run automatically or not. 
+ * @return - 0 if yes, 1 otherwise*/
+int promptForAutoRun(char *message);
+
+/* Runs the programs with the pre-defined numbers of threads and random integers. */
+void autoRunProgramWithDesignatedValues();
+
 /* Executes the program fully (sorting and merging). */
 void executeProgram(int numsToGenerate, int numThreadsToExecute);
 

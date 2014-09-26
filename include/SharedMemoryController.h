@@ -19,8 +19,11 @@ void resetSharedMemoryValues();
  * 		Uses a mutex to insure only one thread at a time can access. */
 void designateLargestValue(int largest);
 
+/* Fills an array with integers from file fileName from a specified start location to a 
+ * 		specified end location. */
 void fillArrayFromFile(int *array, char* fileName, int startLoc, int valuesToRead);
 
+/* Stores sorted results in corresponding area of parent array. */
 void storeSortedResultsIntoParentArray(int *parentArray, int *resultArray, int start, int end);
 
 /* Logs the result of a mutex action.

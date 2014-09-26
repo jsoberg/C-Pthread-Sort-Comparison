@@ -24,21 +24,66 @@ char *DEFAULT_RESULT_FILE_NAME = "Sorted";
 int main(int argc, char **argv)
 {
 	if (argc != 3) {
-		fprintf(stdout, "No input values or incorrect amount of input values detected, run automatic script. ");
+		// Incorrect or no input values detected, ask to run automatically.
+		char message[] = "No input values detected or incorrect amount of input values detected, would you like to run automatically? (Y/N): ";
+		int result = promptForAutoRun(message);
 		
-		// If correct values aren't input, run auto script.
-		int i;
-		for(i = 0; i < LENGTH(NUM_THREADS_TO_EXECUTE); i ++) {
-			executeProgram(NUMS_TO_GENERATE, NUM_THREADS_TO_EXECUTE[i]);
+		if(result == 0) {// User chose to run automatically.
+			autoRunProgramWithDesignatedValues();
+		} else { // User chose not to run automatically.
+			deconstructSharedMemoryValues();
+			return 0;
 		}
-
-		// Destroying shared memory values.
-		deconstructSharedMemoryValues();
 	} else { // Input parameters were given.
-		executeProgram(atoi(argv[2]), atoi(argv[1]));
+		int numThreadsToExecute = atoi(argv[1]);
+		int numsToGenerate = atoi(argv[2]);
+		
+		if(numThreadsToExecute >= numsToGenerate) {
+			char message[] = "The number of threads cannot exceed or be equal to the number of random integers. Would you instead like to run automatically? (Y/N): ";
+			int result = promptForAutoRun(message);
+		
+			if(result == 0) {// User chose to run automatically.
+				autoRunProgramWithDesignatedValues();
+			} else { // User chose not to run automatically.
+				deconstructSharedMemoryValues();
+				return 0;
+			}
+		} else {
+			executeProgram(numsToGenerate, numThreadsToExecute);
+		}
 	}	
 	
+	// Destroying shared memory values.
+	deconstructSharedMemoryValues();
+	
 	return 0;
+}
+
+/* Prompts user to run automatically or not. 
+ * @return - 0 if yes, 1 otherwise*/
+int promptForAutoRun(char *message)
+{
+	// Prompting user.
+	char answer;
+	fprintf(stdout, message);
+	fflush( stdin );
+	fscanf(stdin, " %c", &answer);
+		
+	// User specified not to run automatically.
+	if(answer != 'Y' && answer != 'y')
+		return 1;
+	
+	// User specified to run automatically.
+	return 0;
+}
+
+/* Runs the programs with the pre-defined numbers of threads and random integers. */
+void autoRunProgramWithDesignatedValues()
+{
+	int i;
+	for(i = 0; i < LENGTH(NUM_THREADS_TO_EXECUTE); i ++) {
+		executeProgram(NUMS_TO_GENERATE, NUM_THREADS_TO_EXECUTE[i]);
+	}
 }
 
 /* Executes the program fully (sorting and merging). */
@@ -79,7 +124,7 @@ void executeProgram(int numsToGenerate, int numThreadsToExecute)
 		printArrayToFile(fileName, resultArray, 0, LENGTH(resultArray));
 		
 		// Printing file name.
-		printf("\n Sorted output can be found in %s.", fileName);
+		printf("\n Sorted output can be found in %s.\n", fileName);
 		fflush( stdout );
 }
 
