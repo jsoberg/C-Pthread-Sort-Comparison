@@ -1,6 +1,4 @@
-/* Joshua Soberg
- * CPSC 542
- * Program 1: Master-Slave Application using Pthreads */
+/* Joshua Soberg */
 
 #include "SharedMemoryController.h"
 
